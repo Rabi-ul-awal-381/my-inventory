@@ -13,7 +13,21 @@ class ItemController extends Controller
     // Show all items for the logged-in user
     public function index()
     {
-        $items = Auth::user()->items()->with('crew')->latest()->get();
+        $user = Auth::user();
+        
+        // Get personal items
+        $personalItems = $user->items()->with('crew')->latest()->get();
+        
+        // Get crew items from crews the user is a member of
+        $crewItems = Item::whereHas('crew', function($query) use ($user) {
+            $query->whereHas('members', function($memberQuery) use ($user) {
+                $memberQuery->where('user_id', $user->id);
+            });
+        })->with('crew', 'user')->latest()->get();
+        
+        // Merge and sort by created_at
+        $items = $personalItems->merge($crewItems)->sortByDesc('created_at');
+        
         return view('items.index', compact('items'));
     }
 
@@ -91,6 +105,9 @@ class ItemController extends Controller
     // Show a single item
     public function show(Item $item)
     {
+        // Load the crew relationship
+        $item->load('crew');
+        
         // Check if user can see this item
         if ($item->crew_id) {
             // Item belongs to a crew - check crew membership
@@ -208,4 +225,6 @@ class ItemController extends Controller
 
         return redirect()->route('items.index')->with('success', 'Item deleted successfully!');
     }
+
+
 }

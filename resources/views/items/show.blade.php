@@ -17,8 +17,15 @@
                     </h1>
                     <p class="text-blue-200">Item Details</p>
                 </div>
-                
-                <div class="space-x-4">
+                @auth
+                <div class="flex justify-evenly space-x-4">
+                    @if($item->crew)
+                        <a href="{{ route('crews.show', $item->crew) }}" class="bg-blue-500 hover:bg-blue-400 px-3 py-1 rounded text-sm">
+                            Back To Crew
+                        </a>
+                    @endif
+                    @endauth
+                <div class="space-x-4 ">
                     <a href="{{ route('items.index') }}" class="bg-blue-500 hover:bg-blue-400 px-3 py-1 rounded text-sm">
                         My Items
                     </a>
@@ -104,9 +111,13 @@
 
                             <!-- Action Buttons -->
                             <div class="flex space-x-3">
+                            @can('update', $item)
                                 <a href="{{ route('items.edit', $item) }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                                     Edit Item
                                 </a>
+                                @endcan
+
+                                @can('delete', $item)
                                 
                                 <form action="{{ route('items.destroy', $item) }}" method="POST" class="inline"
                                     onsubmit="return confirm('Are you sure you want to delete this item?')">
@@ -116,6 +127,7 @@
                                         Delete Item
                                     </button>
                                 </form>
+                                @endcan
                             </div>
                         </div>
                     </div>

@@ -9,25 +9,6 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-
-    public function ownedCrews()
-{
-    return $this->hasMany(Crew::class, 'owner_id');
-}
-
-public function crews()
-{
-    return $this->belongsToMany(Crew::class, 'crew_user')
-                ->withPivot('role', 'custom_permissions')
-                ->withTimestamps();
-}
-
-public function items()
-{
-    return $this->hasMany(Item::class);
-}
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -62,5 +43,23 @@ public function items()
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relationships
+    public function ownedCrews()
+    {
+        return $this->hasMany(Crew::class, 'owner_id');
+    }
+
+    public function crews()
+    {
+        return $this->belongsToMany(Crew::class, 'crew_users')
+                    ->withPivot('role', 'custom_permissions')
+                    ->withTimestamps();
+    }
+
+    public function items()
+    {
+        return $this->hasMany(Item::class);
     }
 }

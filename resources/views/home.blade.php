@@ -6,7 +6,7 @@
     <title>{{ $appName }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-r from-blue-600 via-purple-500 to-indigo-500">
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
         <header class="bg-blue-600 text-white p-4">
@@ -38,37 +38,37 @@
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 container mx-auto p-4">
+        <main class="flex-1 container mx-auto p-4 mt-5 ">
             <div class="max-w-2xl mx-auto">
                 @if($user)
                     <!-- Logged-in user dashboard -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                             <a href="{{ route('items.index') }}" class="block p-4 border rounded-lg hover:bg-gray-50 bg-green-50 border-green-200">
                                 <h3 class="font-semibold">📱 My Items</h3>
-                                <p class="text-sm text-gray-600">View all your uploaded items</p>
-                                <span class="text-xs text-green-600">✅ Ready to use!</span>
+                                <p class="text-sm text-gray-600 mt-2">View all your uploaded items</p>
+                               
                             </a>
                             <a href="{{ route('crews.index') }}" class="block p-4 border rounded-lg hover:bg-gray-50 bg-blue-50 border-blue-200">
                                 <h3 class="font-semibold">👥 My Crews</h3>
-                                <p class="text-sm text-gray-600">Manage your crew memberships</p>
-                                <span class="text-xs text-blue-600">✅ Ready to use!</span>
+                                <p class="text-sm text-gray-600 mt-2">Manage your crew memberships</p>
+                               
                             </a>
                             <a href="{{ route('items.create') }}" class="block p-4 border rounded-lg hover:bg-gray-50 bg-yellow-50 border-yellow-200">
                                 <h3 class="font-semibold">➕ Upload Item</h3>
-                                <p class="text-sm text-gray-600">Add new clothing or accessories</p>
-                                <span class="text-xs text-yellow-600">✅ Ready to use!</span>
+                                <p class="text-sm text-gray-600 mt-2">Add new clothing or accessories</p>
+                               
                             </a>
                             <a href="{{ route('crews.join-form') }}" class="block p-4 border rounded-lg hover:bg-gray-50 bg-purple-50 border-purple-200">
                                 <h3 class="font-semibold">🔗 Join Crew</h3>
                                 <p class="text-sm text-gray-600">Join an existing crew</p>
-                                <span class="text-xs text-purple-600">✅ Ready to use!</span>
+                               
                             </a>
                         </div>
                 @else
                     <!-- Guest user landing page -->
                     <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
                         <h2 class="text-xl font-semibold mb-4">Welcome to Your Crew Inventory</h2>
-                        <p class="text-gray-600 mb-4">
+                        <p class="text-gray-600 mb-4 mt-2">
                             A private app to manage clothing and accessories with your crew members.
                         </p>
                         

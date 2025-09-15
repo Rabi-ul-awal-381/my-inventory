@@ -28,6 +28,12 @@ class Item extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Relationship: Item belongs to a Crew
+    public function crew()
+    {
+        return $this->belongsTo(Crew::class);
+    }
+
     // Helper method to get image URL
     public function getImageUrl()
     {

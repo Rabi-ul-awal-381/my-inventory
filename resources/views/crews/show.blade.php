@@ -59,12 +59,15 @@
                                 @endif
                             </div>
                             @if($crew->isOwner(Auth::user()))
-                                <div class="flex space-x-2">
-                                    <a href="{{ route('crews.edit', $crew) }}" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
-                                        Edit
-                                    </a>
-                                </div>
-                            @endif
+    <div class="flex space-x-2">
+        <a href="{{ route('crews.edit', $crew) }}" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+            Edit
+        </a>
+        <a href="{{ route('crews.roles', $crew) }}" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700">
+            Manage Roles
+        </a>
+    </div>
+@endif
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 text-center">
@@ -86,9 +89,12 @@
                             <div class="mt-4 pt-4 border-t">
                                 <a href="{{ route('items.create') }}?crew={{ $crew->id }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                                     Add Item to Crew
+
+                                  
                                 </a>
                             </div>
                         @endif
+                        
                     </div>
 
                     <!-- Crew Items -->
@@ -98,6 +104,7 @@
                         @if($crew->items->count() > 0)
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 @foreach($crew->items->take(6) as $item)
+                                <a href="{{ route('items.show', $item) }}" >
                                     <div class="border rounded-lg p-3 hover:shadow-md transition-shadow">
                                         <div class="flex items-center space-x-3">
                                             <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
@@ -107,13 +114,16 @@
                                                     <div class="w-full h-full bg-gray-300"></div>
                                                 @endif
                                             </div>
+                                            
                                             <div class="flex-1">
                                                 <h4 class="font-medium">{{ $item->name }}</h4>
                                                 <p class="text-sm text-gray-600">{{ $item->category }}</p>
                                                 <p class="text-xs text-gray-500">by {{ $item->user->name }}</p>
                                             </div>
+                                            
                                         </div>
                                     </div>
+                                    </a>
                                 @endforeach
                             </div>
                             
@@ -145,46 +155,48 @@
                         <h3 class="text-lg font-semibold mb-4">Members ({{ $crew->members->count() }})</h3>
                         
                         <div class="space-y-3">
-                            @foreach($crew->members as $member)
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                            {{ substr($member->name, 0, 1) }}
-                                        </div>
-                                        <div>
-                                            <p class="font-medium text-sm">{{ $member->name }}</p>
-                                            <p class="text-xs text-gray-500 capitalize">{{ $member->pivot->role }}</p>
-                                        </div>
-                                    </div>
-                                    
-                                    @if($crew->isOwner(Auth::user()) && !$crew->isOwner($member))
-                                        <div class="flex space-x-1">
-                                            <!-- Role Change Dropdown -->
-                                            <form action="{{ route('crews.update-member-role', [$crew, $member]) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('PATCH')
-                                                <select name="role" onchange="this.form.submit()" class="text-xs border rounded px-1 py-1">
-                                                    <option value="viewer" {{ $member->pivot->role === 'viewer' ? 'selected' : '' }}>Viewer</option>
-                                                    <option value="uploader" {{ $member->pivot->role === 'uploader' ? 'selected' : '' }}>Uploader</option>
-                                                    <option value="editor" {{ $member->pivot->role === 'editor' ? 'selected' : '' }}>Editor</option>
-                                                </select>
-                                            </form>
-                                            
-                                            <!-- Remove Member -->
-                                            <form action="{{ route('crews.remove-member', [$crew, $member]) }}" method="POST" class="inline"
-                                                onsubmit="return confirm('Remove {{ $member->name }} from crew?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-800 text-xs px-1">×</button>
-                                            </form>
-                                        </div>
-                                    @endif
-                                    
-                                    @if($crew->isOwner($member))
-                                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">OWNER</span>
-                                    @endif
-                                </div>
-                            @endforeach
+                        @foreach($crew->members as $member)
+    @php
+        $roleInfo = $crew->getMemberRoleInfo($member);
+    @endphp
+    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-{{ $roleInfo['color'] }}-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {{ substr($member->name, 0, 1) }}
+            </div>
+            <div>
+                <p class="font-medium text-sm">{{ $member->name }}</p>
+                @if($roleInfo['type'] === 'custom')
+                    <p class="text-xs text-{{ $roleInfo['color'] }}-600 font-medium">{{ $roleInfo['name'] }}</p>
+                @else
+                    <p class="text-xs text-gray-500 capitalize">{{ $roleInfo['name'] }}</p>
+                @endif
+            </div>
+        </div>
+        
+        @if($crew->isOwner(Auth::user()) && !$crew->isOwner($member))
+            <div class="flex items-center space-x-2">
+                <!-- Change Role Button -->
+                <button onclick="openRoleModal({{ $member->id }}, '{{ $member->name }}')" 
+                        class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200">
+                    Change Role
+                </button>
+                
+                <!-- Remove Member -->
+                <form action="{{ route('crews.remove-member', [$crew, $member]) }}" method="POST" class="inline"
+                    onsubmit="return confirm('Remove {{ $member->name }} from crew?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-red-600 hover:text-red-800 text-xs px-1">×</button>
+                </form>
+            </div>
+        @endif
+        
+        @if($crew->isOwner($member))
+            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">OWNER</span>
+        @endif
+    </div>
+@endforeach
                         </div>
                     </div>
 
@@ -245,5 +257,100 @@
             </div>
         </main>
     </div>
+
+    <!-- Role Assignment Modal -->
+<div id="roleModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-96 max-w-md mx-4">
+        <h3 class="text-lg font-semibold mb-4">Assign Role to <span id="memberName"></span></h3>
+        
+        <form id="roleAssignForm" method="POST">
+            @csrf
+            <div class="space-y-4">
+                <!-- Role Type Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Role Type</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="role_type" value="default" class="mr-2" checked>
+                            <span class="text-sm">Default Role</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="role_type" value="custom" class="mr-2">
+                            <span class="text-sm">Custom Role</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Default Role Selection -->
+                <div id="defaultRoleSection">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Default Role</label>
+                    <select name="default_role" class="w-full border border-gray-300 rounded px-3 py-2">
+                        <option value="viewer">Viewer</option>
+                        <option value="uploader">Uploader</option>
+                        <option value="editor">Editor</option>
+                    </select>
+                </div>
+
+                <!-- Custom Role Selection -->
+                <div id="customRoleSection" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Custom Role</label>
+                    <select name="role_id" class="w-full border border-gray-300 rounded px-3 py-2">
+                        <option value="">Select a custom role</option>
+                        @foreach($crew->customRoles as $customRole)
+                            <option value="{{ $customRole->id }}">{{ $customRole->name }}</option>
+                        @endforeach
+                    </select>
+                    @if($crew->customRoles->count() === 0)
+                        <p class="text-sm text-gray-500 mt-1">
+                            <a href="{{ route('crews.roles', $crew) }}" class="text-blue-600 hover:text-blue-800">
+                                Create custom roles first
+                            </a>
+                        </p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="flex space-x-3 mt-6">
+                <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                    Assign Role
+                </button>
+                <button type="button" onclick="closeRoleModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openRoleModal(memberId, memberName) {
+    document.getElementById('memberName').textContent = memberName;
+    document.getElementById('roleAssignForm').action = `/crews/{{ $crew->id }}/members/${memberId}/assign-role`;
+    document.getElementById('roleModal').classList.remove('hidden');
+}
+
+function closeRoleModal() {
+    document.getElementById('roleModal').classList.add('hidden');
+}
+
+// Toggle role sections based on selection
+document.addEventListener('DOMContentLoaded', function() {
+    const roleTypeInputs = document.querySelectorAll('input[name="role_type"]');
+    const defaultSection = document.getElementById('defaultRoleSection');
+    const customSection = document.getElementById('customRoleSection');
+
+    roleTypeInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value === 'default') {
+                defaultSection.classList.remove('hidden');
+                customSection.classList.add('hidden');
+            } else {
+                defaultSection.classList.add('hidden');
+                customSection.classList.remove('hidden');
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

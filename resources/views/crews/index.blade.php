@@ -74,11 +74,13 @@
                                 @if($crew->description)
                                     <p class="text-gray-600 text-sm mb-3">{{ Str::limit($crew->description, 80) }}</p>
                                 @endif
-
                                 <div class="flex justify-between text-sm text-gray-500 mb-4">
-                                    <span>👥 {{ $crew->members_count }} {{ Str::plural('member', $crew->members_count) }}</span>
-                                    <span>📦 {{ $crew->items_count }} {{ Str::plural('item', $crew->items_count) }}</span>
-                                </div>
+    <span>👥 {{ $crew->members_count }} {{ Str::plural('member', $crew->members_count) }}</span>
+    <span>📦 {{ $crew->items_count }} {{ Str::plural('item', $crew->items_count) }}</span>
+</div>
+<div class="text-xs text-purple-600 mb-2">
+    🎭 {{ $crew->customRoles->count() }} custom {{ Str::plural('role', $crew->customRoles->count()) }}
+</div>
 
                                 <div class="bg-gray-50 p-2 rounded mb-3">
                                     <p class="text-xs text-gray-600">Invite Code:</p>

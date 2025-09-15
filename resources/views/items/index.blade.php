@@ -109,36 +109,6 @@
         </div>
     @endforeach
 </div>
-
-                            <!-- Item Details -->
-                            <div class="p-4">
-                                <h3 class="font-semibold text-lg mb-1">{{ $item->name }}</h3>
-                                <p class="text-sm text-gray-600 mb-2">{{ $item->category }}</p>
-                                
-                                <div class="flex justify-between items-center text-xs text-gray-500 mb-3">
-                                    @if($item->size)
-                                        <span>Size: {{ $item->size }}</span>
-                                    @endif
-                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded">{{ $item->condition }}</span>
-                                </div>
-
-                                @if($item->description)
-                                    <p class="text-sm text-gray-700 mb-3 line-clamp-2">{{ Str::limit($item->description, 80) }}</p>
-                                @endif
-
-                                <!-- Action Buttons -->
-                                <div class="flex space-x-2">
-                                    <a href="{{ route('items.show', $item) }}" class="flex-1 bg-blue-500 text-white text-center py-2 rounded text-sm hover:bg-blue-600">
-                                        View
-                                    </a>
-                                    <a href="{{ route('items.edit', $item) }}" class="flex-1 bg-gray-500 text-white text-center py-2 rounded text-sm hover:bg-gray-600">
-                                        Edit
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
             @else
                 <!-- Empty State -->
                 <div class="text-center py-12">
