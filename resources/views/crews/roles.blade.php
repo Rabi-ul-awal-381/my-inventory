@@ -95,7 +95,7 @@
 
                                         <!-- Actions -->
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('crews.edit-role', [$crew, $role]) }}" class="flex-1 bg-{{ $role->color }}-600 text-white py-1 px-2 rounded text-sm hover:bg-{{ $role->color }}-700 text-center block">
+                                            <a href="{{ route('crews.edit-role', [$crew, $role]) }}" class="flex-1 bg-{{ $role->color }}-600 text-white py-1 px-2 rounded text-sm hover:bg-{{ $role->color }}-700 text-center">
                                                 Edit
                                             </a>
                                             <form method="POST" action="{{ route('crews.destroy-role', [$crew, $role]) }}" class="flex-1"

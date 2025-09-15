@@ -97,14 +97,32 @@
                 @endif
 
                 <!-- Action Buttons -->
-                <div class="flex space-x-2">
-                    <a href="{{ route('items.show', $item) }}" class="flex-1 bg-blue-500 text-white text-center py-2 rounded text-sm hover:bg-blue-600">
-                        View
-                    </a>
-                    <a href="{{ route('items.edit', $item) }}" class="flex-1 bg-gray-500 text-white text-center py-2 rounded text-sm hover:bg-gray-600">
-                        Edit
-                    </a>
-                </div>
+                    @php
+                        $canEdit = false;
+                        
+                        if ($item->crew_id) {
+                            // Item belongs to a crew - check crew permissions
+                            $canEdit = $item->crew->canUserEdit(Auth::user()) || $item->user_id === Auth::id();
+                        } else {
+                            // Personal item - only owner can edit
+                            $canEdit = $item->user_id === Auth::id();
+                        }
+                    @endphp
+
+                    <div class="flex space-x-2">
+                        <a href="{{ route('items.show', $item) }}" class="flex-1 bg-blue-500 text-white text-center py-2 rounded text-sm hover:bg-blue-600">
+                            View
+                        </a>
+                        @if($canEdit)
+                            <a href="{{ route('items.edit', $item) }}" class="flex-1 bg-gray-500 text-white text-center py-2 rounded text-sm hover:bg-gray-600">
+                                Edit
+                            </a>
+                        @else
+                            <span class="flex-1 bg-gray-300 text-gray-500 text-center py-2 rounded text-sm cursor-not-allowed">
+                                No Edit
+                            </span>
+                        @endif
+                    </div>
             </div>
         </div>
     @endforeach

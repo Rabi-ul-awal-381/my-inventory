@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Role - {{ $crew->name }}</title>
+    <title>Edit Role - {{ $role->name }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
@@ -15,7 +15,7 @@
                     <h1 class="text-2xl font-bold">
                         <a href="{{ route('home') }}" class="hover:text-purple-200">Crew Inventory</a>
                     </h1>
-                    <p class="text-purple-200">Edit Role</p>
+                    <p class="text-purple-200">Edit Role: {{ $role->name }}</p>
                 </div>
                 
                 <div class="space-x-4">
@@ -77,38 +77,61 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3">Permissions *</label>
                             <div class="space-y-3 bg-gray-50 p-4 rounded-lg">
-                                @foreach ($defaultPermissions as $key => $default)
-                                    <label class="flex items-center">
-                                        <input type="hidden" name="permissions[{{ $key }}]" value="0">
-                                        <input type="checkbox" name="permissions[{{ $key }}]" value="1" 
-                                            {{ old("permissions.$key", $role->permissions[$key] ?? false) ? 'checked' : '' }}
-                                            class="mr-3">
-                                        <div>
-                                            @switch($key)
-                                                @case('can_view_items')
-                                                    <span class="font-medium">👁️ View Items</span>
-                                                    <p class="text-sm text-gray-600">Can see all items in the crew</p>
-                                                    @break
-                                                @case('can_upload')
-                                                    <span class="font-medium">📤 Upload Items</span>
-                                                    <p class="text-sm text-gray-600">Can add new items to the crew</p>
-                                                    @break
-                                                @case('can_edit')
-                                                    <span class="font-medium">✏️ Edit Items</span>
-                                                    <p class="text-sm text-gray-600">Can modify item details</p>
-                                                    @break
-                                                @case('can_delete')
-                                                    <span class="font-medium">🗑️ Delete Items</span>
-                                                    <p class="text-sm text-gray-600">Can remove items</p>
-                                                    @break
-                                                @case('can_manage_members')
-                                                    <span class="font-medium">👥 Manage Members</span>
-                                                    <p class="text-sm text-gray-600">Can manage crew members</p>
-                                                    @break
-                                            @endswitch
-                                        </div>
-                                    </label>
-                                @endforeach
+                                
+                                <label class="flex items-center">
+                                    <input type="hidden" name="permissions[can_view_items]" value="0">
+                                    <input type="checkbox" name="permissions[can_view_items]" value="1" 
+                                        {{ old('permissions.can_view_items', $role->canViewItems()) ? 'checked' : '' }}
+                                        class="mr-3">
+                                    <div>
+                                        <span class="font-medium">👁️ View Items</span>
+                                        <p class="text-sm text-gray-600">Can see all items in the crew</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center">
+                                    <input type="hidden" name="permissions[can_upload]" value="0">
+                                    <input type="checkbox" name="permissions[can_upload]" value="1" 
+                                        {{ old('permissions.can_upload', $role->canUpload()) ? 'checked' : '' }}
+                                        class="mr-3">
+                                    <div>
+                                        <span class="font-medium">📤 Upload Items</span>
+                                        <p class="text-sm text-gray-600">Can add new items to the crew</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center">
+                                    <input type="hidden" name="permissions[can_edit]" value="0">
+                                    <input type="checkbox" name="permissions[can_edit]" value="1" 
+                                        {{ old('permissions.can_edit', $role->canEdit()) ? 'checked' : '' }}
+                                        class="mr-3">
+                                    <div>
+                                        <span class="font-medium">✏️ Edit Items</span>
+                                        <p class="text-sm text-gray-600">Can modify item details, descriptions, etc.</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center">
+                                    <input type="hidden" name="permissions[can_delete]" value="0">
+                                    <input type="checkbox" name="permissions[can_delete]" value="1" 
+                                        {{ old('permissions.can_delete', $role->canDelete()) ? 'checked' : '' }}
+                                        class="mr-3">
+                                    <div>
+                                        <span class="font-medium">🗑️ Delete Items</span>
+                                        <p class="text-sm text-gray-600">Can permanently remove items</p>
+                                    </div>
+                                </label>
+
+                                <label class="flex items-center">
+                                    <input type="hidden" name="permissions[can_manage_members]" value="0">
+                                    <input type="checkbox" name="permissions[can_manage_members]" value="1" 
+                                        {{ old('permissions.can_manage_members', $role->canManageMembers()) ? 'checked' : '' }}
+                                        class="mr-3">
+                                    <div>
+                                        <span class="font-medium">👥 Manage Members</span>
+                                        <p class="text-sm text-gray-600">Can change other members' roles</p>
+                                    </div>
+                                </label>
                             </div>
                             @error('permissions')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -117,7 +140,7 @@
 
                         <!-- Submit Buttons -->
                         <div class="flex space-x-4 pt-4">
-                            <button type="submit" class="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 font-medium" onclick="console.log('Form submitting with method:', document.querySelector('input[name=\'_method\']').value)">
+                            <button type="submit" class="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 font-medium">
                                 Update Role
                             </button>
                             <a href="{{ route('crews.roles', $crew) }}" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 font-medium text-center">

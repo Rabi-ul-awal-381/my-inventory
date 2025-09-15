@@ -109,16 +109,30 @@
                                 </p>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="flex space-x-3">
-                            @can('update', $item)
+                 <!-- Action Buttons -->
+                        <div class="flex space-x-3">
+                            @php
+                                $canEdit = false;
+                                $canDelete = false;
+                                
+                                if ($item->crew_id) {
+                                    // Item belongs to a crew - check crew permissions
+                                    $canEdit = $item->crew->canUserEdit(Auth::user()) || $item->user_id === Auth::id();
+                                    $canDelete = $item->crew->canUserDelete(Auth::user()) || $item->user_id === Auth::id();
+                                } else {
+                                    // Personal item - only owner can edit/delete
+                                    $canEdit = $item->user_id === Auth::id();
+                                    $canDelete = $item->user_id === Auth::id();
+                                }
+                            @endphp
+                            
+                            @if($canEdit)
                                 <a href="{{ route('items.edit', $item) }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                                     Edit Item
                                 </a>
-                                @endcan
-
-                                @can('delete', $item)
-                                
+                            @endif
+                            
+                            @if($canDelete)
                                 <form action="{{ route('items.destroy', $item) }}" method="POST" class="inline"
                                     onsubmit="return confirm('Are you sure you want to delete this item?')">
                                     @csrf
@@ -127,8 +141,13 @@
                                         Delete Item
                                     </button>
                                 </form>
-                                @endcan
-                            </div>
+                            @endif
+                            
+                            @if(!$canEdit && !$canDelete)
+                                <p class="text-gray-500 text-sm">You don't have permission to modify this item.</p>
+                            @endif
+                        </div>
+                            
                         </div>
                     </div>
                 </div>

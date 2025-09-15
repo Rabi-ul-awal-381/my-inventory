@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CrewRole;
 
+
+
+
+
+
 class CrewController extends Controller
 {
     // Show all crews user belongs to
@@ -57,8 +62,10 @@ class CrewController extends Controller
 
         $crew->load('members', 'items.user', 'owner');
         $userRole = $crew->getMemberRole(Auth::user());
+
+        $customRoles = $crew->roles()->get(); // fetch roles defined for this crew
         
-        return view('crews.show', compact('crew', 'userRole'));
+        return view('crews.show', compact('crew', 'userRole', 'customRoles'));
     }
 
     // Show edit form (owner only)
@@ -153,8 +160,11 @@ class CrewController extends Controller
         }
 
         $request->validate([
-            'role' => 'required|in:viewer,uploader,editor'
+            'role_type' => 'required|in:default,custom',
+            'role'      => 'required_if:role_type,default|in:viewer,uploader,editor',
+            'role_id'   => 'required_if:role_type,custom|exists:roles,id',
         ]);
+        
 
         $crew->members()->updateExistingPivot($user->id, ['role' => $request->role]);
 
@@ -328,4 +338,7 @@ public function assignRole(Request $request, Crew $crew, User $user)
 
     return back()->with('success', 'Member role updated successfully!');
 }
+
+
+
 }

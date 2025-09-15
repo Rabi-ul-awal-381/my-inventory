@@ -50,6 +50,15 @@ class Crew extends Model
         return $this->hasMany(CrewRole::class);
     }
 
+    // app/Models/Crew.php
+
+public function roles()
+{
+    return $this->hasMany(CrewRole::class, 'crew_id');
+}
+
+
+
     // Helper methods
     public function isOwner($user)
     {

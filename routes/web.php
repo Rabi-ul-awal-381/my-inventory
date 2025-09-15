@@ -39,6 +39,11 @@ Route::patch('/crews/{crew}/roles/{role}', [CrewController::class, 'updateRole']
 Route::delete('/crews/{crew}/roles/{role}', [CrewController::class, 'destroyRole'])->name('crews.destroy-role');
 Route::post('/crews/{crew}/members/{user}/assign-role', [CrewController::class, 'assignRole'])->name('crews.assign-role');
 
+
+Route::get('/crews/{crew}/roles/{role}/edit', [CrewController::class, 'editRole'])->name('crews.edit-role');
+Route::patch('/crews/{crew}/roles/{role}', [CrewController::class, 'updateRole'])->name('crews.update-role');
+Route::delete('/crews/{crew}/roles/{role}', [CrewController::class, 'destroyRole'])->name('crews.destroy-role');
+
 });
 
 // Items routes - only for authenticated users
