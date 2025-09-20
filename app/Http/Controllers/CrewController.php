@@ -161,9 +161,10 @@ class CrewController extends Controller
 
         $request->validate([
             'role_type' => 'required|in:default,custom',
-            'role'      => 'required_if:role_type,default|in:viewer,uploader,editor',
-            'role_id'   => 'required_if:role_type,custom|exists:roles,id',
+            'role' => 'required_if:role_type,default',   // <-- changed here
+            'role_id' => 'required_if:role_type,custom',
         ]);
+        
         
 
         $crew->members()->updateExistingPivot($user->id, ['role' => $request->role]);
@@ -313,12 +314,6 @@ public function assignRole(Request $request, Crew $crew, User $user)
         abort(403, 'You do not have permission to manage member roles.');
     }
 
-    $request->validate([
-        'role_type' => 'required|in:default,custom',
-        'role_id' => 'nullable|required_if:role_type,custom|exists:crew_roles,id',
-        'default_role' => 'required_if:role_type,default|in:viewer,uploader,editor'
-    ]);
-
     if ($request->role_type === 'custom') {
         $customRole = CrewRole::findOrFail($request->role_id);
         if ($customRole->crew_id !== $crew->id) {
@@ -332,7 +327,7 @@ public function assignRole(Request $request, Crew $crew, User $user)
     } else {
         $crew->members()->updateExistingPivot($user->id, [
             'crew_role_id' => null,
-            'role' => $request->default_role
+            'role' => $request->role
         ]);
     }
 

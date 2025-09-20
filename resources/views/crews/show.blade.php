@@ -199,253 +199,218 @@
         </div>
     </main>
 
-    <!-- Role Modal -->
-<div id="roleModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm animate-fade-in">
-    <div class="bg-gray-900 rounded-2xl shadow-[0_0_25px_rgba(99,102,241,0.6)] w-full max-w-md p-6 border border-gray-700 scale-95 opacity-0 transition-transform transition-opacity duration-300" id="roleModalContent">
-        <h2 class="text-xl font-bold mb-4 text-indigo-400">Change Role for <span id="memberName"></span></h2>
-        <form id="roleAssignForm" method="POST">
-            @csrf
-            <div class="space-y-4">
-                <!-- Role Type Selection -->
-                <div>
-    <label class="block font-semibold mb-2">Role Type:</label>
-    <div class="flex space-x-4">
-        <label class="flex items-center space-x-2">
-            <input type="radio" name="role_type" value="default" checked class="form-radio text-indigo-500">
-            <span>Default</span>
-        </label>
-        <label class="flex items-center space-x-2">
-            <input type="radio" name="role_type" value="custom" class="form-radio text-indigo-500">
-            <span>Custom</span>
-        </label>
-    </div>
+    <!-- Role Modal (REPLACE your existing modal with this block) -->
+<div id="roleModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm">
+  <div id="roleModalContent" class="bg-gray-900 rounded-2xl shadow-[0_0_25px_rgba(99,102,241,0.6)] w-full max-w-md p-6 border border-gray-700 transform scale-95 opacity-0 transition-all duration-300">
+    <h2 class="text-xl font-bold mb-4 text-indigo-400">Change Role for <span id="memberName" class="text-white"></span></h2>
+
+    <form id="roleAssignForm" method="POST">
+      @csrf
+      <!-- Role type -->
+      <div class="mb-4">
+        <label class="block font-semibold mb-2 text-gray-200">Role Type:</label>
+        <div class="flex space-x-4">
+          <label class="flex items-center space-x-2">
+            <input id="roleTypeDefault" type="radio" name="role_type" value="default" checked class="form-radio text-indigo-500">
+            <span class="text-gray-200">Default</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input id="roleTypeCustom" type="radio" name="role_type" value="custom" class="form-radio text-indigo-500">
+            <span class="text-gray-200">Custom</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Default Role Section (visible for default) -->
+      <div id="defaultRoleSection" class="mb-4">
+        <label class="block font-semibold mb-2 text-gray-200">Choose Default Role:</label>
+        <select id="defaultRoleSelect" name="role" class="w-full rounded-lg bg-gray-800 border border-gray-700 p-2 text-white">
+          <option value="">-- Select default role --</option>
+          <option value="editor">Editor</option>
+          <option value="uploader">Uploader</option>
+          <option value="viewer">Viewer</option>
+        </select>
+      </div>
+
+      <!-- Custom Role Section (visible for custom) -->
+      <div id="customRoleSection" class="hidden mb-4">
+        <label for="customRoleSelect" class="block font-semibold mb-2 text-gray-200">Select Custom Role:</label>
+        <select id="customRoleSelect" name="role_id" class="w-full rounded-lg bg-gray-800 border border-gray-700 p-2 text-white">
+          <option value="">-- Choose a custom role --</option>
+          @if(isset($customRoles))
+            @foreach($customRoles as $role)
+              <option value="{{ $role->id }}">{{ $role->name }}</option>
+            @endforeach
+          @endif
+        </select>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end space-x-3 mt-6">
+        <button
+          type="button"
+          onclick="closeRoleModal()"
+          class="px-5 py-2 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold shadow-lg hover:scale-105 transition transform duration-200"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold shadow-lg hover:scale-105 transition transform duration-200"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
-<div id="defaultRoleSection" class="mt-3">
-    <label class="block font-semibold mb-2">Choose Default Role:</label>
-    <select 
-        name="role" 
-        id="defaultRoleSelect"
-        class="w-full rounded-lg bg-gray-800 border border-gray-700 p-2 text-white"
-    >
-        <option  value="editor">Editor</option>
-        <option value="uploader">Uploader</option>
-        <option value="viewer">Viewer</option>
-    </select>
-</div>
-
-
-<!-- Custom Role Section -->
-<div id="customRoleSection" class="hidden space-y-3 mt-3">
-    <label for="role_id" class="block text-sm font-medium text-gray-300">Select Custom Role</label>
-    <select name="role_id" id="role_id"
-        class="w-full bg-gray-900 text-white rounded-lg border border-cyan-500 focus:ring-2 focus:ring-cyan-400">
-        <option value="">-- Choose a role --</option>
-        @foreach ($customRoles as $role)
-            <option value="{{ $role->id }}">{{ $role->name }}</option>
-        @endforeach
-    </select>
-</div>
-
-<div class="flex justify-end space-x-3 mt-6">
-    <button 
-        type="button" 
-        onclick="closeRoleModal()" 
-        class="px-5 py-2 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold shadow-lg shadow-red-500/30 hover:scale-105 hover:shadow-red-500/50 transition transform duration-300"
-    >
-        Cancel
-    </button>
-    <button 
-        type="submit" 
-        class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold shadow-lg shadow-cyan-500/30 hover:scale-105 hover:shadow-cyan-500/50 transition transform duration-300 animate-pulse"
-    >
-        Save
-    </button>
-</div>
-
-</form>
-</div>
-</div>
-</div>
-
-
+<!-- Robust modal script (REPLACE existing modal script with this) -->
 <script>
-/* === Modal open/close & UI toggle (improved) === */
+/* ---------- Modal open/close + toggle + safe submit ---------- */
+
 function openRoleModal(memberId, memberName) {
-    const modal = document.getElementById('roleModal');
-    const content = document.getElementById('roleModalContent');
+  const modal = document.getElementById('roleModal');
+  const content = document.getElementById('roleModalContent');
+  const form = document.getElementById('roleAssignForm');
 
-    document.getElementById('memberName').textContent = memberName;
-    document.getElementById('roleAssignForm').action = '{{ route("crews.assign-role", [$crew, "MEMBER_ID"]) }}'.replace('MEMBER_ID', memberId);
+  // Set member name and form action (blade route replacement)
+  document.getElementById('memberName').textContent = memberName;
+  form.action = '{{ route("crews.assign-role", [$crew, "MEMBER_ID"]) }}'.replace('MEMBER_ID', memberId);
 
-    // Show modal (backdrop)
-    modal.classList.remove('hidden');
+  // Show backdrop
+  modal.classList.remove('hidden');
 
-    // Allow CSS transition for content (zoom/fade)
-    requestAnimationFrame(() => {
-        content.classList.remove('scale-95', 'opacity-0');
-        content.classList.add('scale-100', 'opacity-100');
-    });
+  // animate in
+  requestAnimationFrame(() => {
+    content.classList.remove('scale-95', 'opacity-0');
+    content.classList.add('scale-100', 'opacity-100');
+  });
 
-    // Ensure correct section (default vs custom) is visible on open
-    applyRoleSectionVisibility();
+  // ensure correct section visible immediately
+  applyRoleSectionVisibility();
 }
 
-/* Close modal with animated hide */
 function closeRoleModal() {
-    const modal = document.getElementById('roleModal');
-    const content = document.getElementById('roleModalContent');
+  const modal = document.getElementById('roleModal');
+  const content = document.getElementById('roleModalContent');
 
-    // Animate out
-    content.classList.remove('scale-100', 'opacity-100');
-    content.classList.add('scale-95', 'opacity-0');
+  // animate out
+  content.classList.remove('scale-100', 'opacity-100');
+  content.classList.add('scale-95', 'opacity-0');
 
-    // After animation finishes, hide backdrop
-    setTimeout(() => {
-        modal.classList.add('hidden');
-    }, 300); // match your duration-300
+  // hide after animation
+  setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
-/* Toggle which section is visible based on selected radio */
+/* Show/hide sections (DO NOT disable inputs) */
 function applyRoleSectionVisibility() {
-    const selectedTypeInput = document.querySelector('input[name="role_type"]:checked');
-    const defaultSection = document.getElementById('defaultRoleSection');
-    const customSection = document.getElementById('customRoleSection');
+  const selected = (document.querySelector('input[name="role_type"]:checked') || {}).value || 'default';
+  const defaultSection = document.getElementById('defaultRoleSection');
+  const customSection = document.getElementById('customRoleSection');
 
-    const selected = selectedTypeInput ? selectedTypeInput.value : 'default';
-
-    if (selected === 'custom') {
-        defaultSection.classList.add('hidden');
-        customSection.classList.remove('hidden');
-    } else {
-        defaultSection.classList.remove('hidden');
-        customSection.classList.add('hidden');
-    }
+  if (selected === 'custom') {
+    defaultSection.classList.add('hidden');
+    customSection.classList.remove('hidden');
+  } else {
+    defaultSection.classList.remove('hidden');
+    customSection.classList.add('hidden');
+  }
 }
 
-/* Add event listeners on radio changes so UI toggles instantly */
+/* DOM ready: attach listeners */
 document.addEventListener('DOMContentLoaded', function() {
-    const roleTypeInputs = document.querySelectorAll('input[name="role_type"]');
+  // radio change handlers
+  document.querySelectorAll('input[name="role_type"]').forEach(radio => {
+    radio.addEventListener('change', applyRoleSectionVisibility);
+  });
 
-    roleTypeInputs.forEach(input => {
-        input.addEventListener('change', function() {
-            applyRoleSectionVisibility();
-        });
+  // backdrop click closes modal when clicking outside content
+  const modal = document.getElementById('roleModal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      const content = document.getElementById('roleModalContent');
+      if (!content.contains(e.target)) closeRoleModal();
     });
+  }
 
-    /* Backdrop-click closes modal (click outside content) */
-    const modal = document.getElementById('roleModal');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            // if click is on backdrop (not inside modal content), close
-            const content = document.getElementById('roleModalContent');
-            if (!content.contains(e.target)) {
-                closeRoleModal();
-            }
-        });
-    }
+  // Submit handler: make sure correct field is present and non-empty
+  const form = document.getElementById('roleAssignForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      // Determine selected role_type:
+      const roleType = (document.querySelector('input[name="role_type"]:checked') || {}).value || 'default';
 
-    /* FORM submit handler: ensure correct fields are present before actual submit */
-    const form = document.getElementById('roleAssignForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            // Determine selected type
-            const selectedTypeInput = document.querySelector('input[name="role_type"]:checked');
-            const roleType = selectedTypeInput ? selectedTypeInput.value : 'default';
+      // Clean previous helper fields we might have inserted
+      form.querySelectorAll('input[data-generated="1"]').forEach(n => n.remove());
 
-            // Clear any helper hidden fields we create previously
-            // (so we start fresh)
-            const prevHiddenRole = form.querySelector('input[name="role"][data-generated="1"]');
-            if (prevHiddenRole) prevHiddenRole.remove();
-            const prevHiddenRoleId = form.querySelector('input[name="role_id"][data-generated="1"]');
-            if (prevHiddenRoleId) prevHiddenRoleId.remove();
+      if (roleType === 'default') {
+        // Read default select or radios (we use the select in this template)
+        const defaultSelect = document.getElementById('defaultRoleSelect');
+        const val = defaultSelect ? defaultSelect.value : '';
 
-            if (roleType === 'default') {
-                // Get the default role value - this could come from a <select name="role"> or radio inputs named "role"
-                let defaultRoleValue = null;
-                const defaultSelect = form.querySelector('[name="role"]');
-                if (defaultSelect && defaultSelect.tagName.toLowerCase() === 'select') {
-                    defaultRoleValue = defaultSelect.value;
-                } else {
-                    // maybe radio buttons named 'role'
-                    const checkedRadio = form.querySelector('input[name="role"]:checked');
-                    if (checkedRadio) defaultRoleValue = checkedRadio.value;
-                }
+        if (!val) {
+          e.preventDefault();
+          alert('Please select a default role (editor, uploader, or viewer).');
+          return false;
+        }
 
-                if (!defaultRoleValue) {
-                    e.preventDefault();
-                    alert('Please choose a default role (viewer, uploader, or editor).');
-                    return false;
-                }
+        // If the visible default select exists and will submit normally, do nothing.
+        // If not (rare), create a hidden fallback (keeps server-side validation happy).
+        const existing = form.querySelector('[name="role"]:not([data-generated="1"])');
+        if (!existing) {
+          const h = document.createElement('input');
+          h.type = 'hidden';
+          h.name = 'role';
+          h.value = val;
+          h.setAttribute('data-generated', '1');
+          form.appendChild(h);
+        }
 
-                // Ensure the backend receives a field named 'role' (existing select may already provide it).
-                // If the select is hidden/disabled and won't submit, we create a hidden field that will.
-                const existingRoleField = form.querySelector('[name="role"]');
-                if (!existingRoleField || existingRoleField.disabled) {
-                    const inp = document.createElement('input');
-                    inp.type = 'hidden';
-                    inp.name = 'role';
-                    inp.value = defaultRoleValue;
-                    inp.setAttribute('data-generated', '1');
-                    form.appendChild(inp);
-                }
-                // remove role_id helper if present (we created earlier)
-                const roleIdField = form.querySelector('[name="role_id"][data-generated="1"]');
-                if (roleIdField) roleIdField.remove();
-            } else if (roleType === 'custom') {
-                // Get selected custom role id
-                const customSelect = form.querySelector('[name="role_id"]');
-                const customRoleValue = customSelect ? customSelect.value : '';
+      } else { // custom
+        const customSelect = document.getElementById('customRoleSelect');
+        const val = customSelect ? customSelect.value : '';
 
-                if (!customRoleValue) {
-                    e.preventDefault();
-                    alert('Please choose a custom role from the dropdown.');
-                    return false;
-                }
+        if (!val) {
+          e.preventDefault();
+          alert('Please select a custom role.');
+          return false;
+        }
 
-                // Ensure backend receives 'role_id'
-                const existingRoleIdField = form.querySelector('[name="role_id"]');
-                if (!existingRoleIdField || existingRoleIdField.disabled) {
-                    const inp = document.createElement('input');
-                    inp.type = 'hidden';
-                    inp.name = 'role_id';
-                    inp.value = customRoleValue;
-                    inp.setAttribute('data-generated', '1');
-                    form.appendChild(inp);
-                }
-                // Also remove a generated 'role' hidden if present
-                const roleField = form.querySelector('[name="role"][data-generated="1"]');
-                if (roleField) roleField.remove();
-            }
+        const existing = form.querySelector('[name="role_id"]:not([data-generated="1"])');
+        if (!existing) {
+          const h = document.createElement('input');
+          h.type = 'hidden';
+          h.name = 'role_id';
+          h.value = val;
+          h.setAttribute('data-generated', '1');
+          form.appendChild(h);
+        }
+      }
 
-            // Also ensure role_type is set (server may rely on it)
-            const rtField = form.querySelector('input[name="role_type"]');
-            if (!rtField) {
-                // create hidden role_type from selected radio
-                const selectedRadio = document.querySelector('input[name="role_type"]:checked');
-                if (selectedRadio) {
-                    const inp = document.createElement('input');
-                    inp.type = 'hidden';
-                    inp.name = 'role_type';
-                    inp.value = selectedRadio.value;
-                    inp.setAttribute('data-generated', '1');
-                    form.appendChild(inp);
-                }
-            } else {
-                // if exists but disabled, enable temporarily (rare)
-                if (rtField.disabled) rtField.disabled = false;
-            }
+      // Ensure role_type is present (radios normally submit it)
+      if (!form.querySelector('[name="role_type"]')) {
+        const selected = document.querySelector('input[name="role_type"]:checked');
+        if (selected) {
+          const h = document.createElement('input');
+          h.type = 'hidden';
+          h.name = 'role_type';
+          h.value = selected.value;
+          h.setAttribute('data-generated','1');
+          form.appendChild(h);
+        }
+      }
 
-            // allow submit to proceed
-            return true;
-        });
-    }
+      // allow submit
+      return true;
+    });
+  }
 
-    // Call applyRoleSectionVisibility initially in case the modal opens with a pre-checked radio
-    applyRoleSectionVisibility();
+  // initial visibility setup
+  applyRoleSectionVisibility();
 });
 </script>
-
 
 
 
